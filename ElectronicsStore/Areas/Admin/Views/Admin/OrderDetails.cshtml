@@ -1,0 +1,136 @@
+﻿@model ElectronicsStore.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details - Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-receipt"></i> Order #@Model.OrderId Details</h2>
+        <a href="/Admin/Admin/Orders" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to Orders
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-person"></i> Customer Information</h5>
+                </div>
+                <div class="card-body bg-white">
+                    <table class="table table-borderless mb-0">
+                        <tbody>
+                            <tr>
+                                <th width="40%" class="text-dark">Full Name:</th>
+                                <td class="text-dark">@Model.FullName</td>
+                            </tr>
+                            <tr>
+                                <th class="text-dark">Phone Number:</th>
+                                <td class="text-dark">@Model.PhoneNumber</td>
+                            </tr>
+                            <tr>
+                                <th class="text-dark">User ID:</th>
+                                <td class="text-dark">@Model.UserId</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Shipping Address</h5>
+                </div>
+                <div class="card-body bg-white">
+                    <p class="mb-2 text-dark"><strong>Address:</strong> @Model.ShippingAddress</p>
+                    <p class="mb-2 text-dark"><strong>City:</strong> @Model.City</p>
+                    <p class="mb-2 text-dark"><strong>State:</strong> @Model.State</p>
+                    <p class="mb-0 text-dark"><strong>Zip Code:</strong> @Model.ZipCode</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow mb-3">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Order Information</h5>
+        </div>
+        <div class="card-body bg-white">
+            <div class="row text-dark">
+                <div class="col-md-3">
+                    <p><strong>Order Date:</strong><br>@Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</p>
+                </div>
+                <div class="col-md-3">
+                    <p><strong>Total Amount:</strong><br><span class="text-primary fs-5 fw-bold">₹@Model.TotalAmount.ToString("N0")</span></p>
+                </div>
+                <div class="col-md-3">
+                    <p><strong>Payment Method:</strong><br>Cash on Delivery</p>
+                </div>
+                <div class="col-md-3">
+                    <p>
+                        <strong>Status:</strong><br>
+                        <span class="badge
+                            @(Model.OrderStatus == "Pending" ? "bg-warning text-dark" :
+                              Model.OrderStatus == "Processing" ? "bg-info text-white" :
+                              Model.OrderStatus == "Shipped" ? "bg-primary text-white" :
+                              Model.OrderStatus == "Delivered" ? "bg-success text-white" : "bg-danger text-white") fs-6">
+                            @Model.OrderStatus
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-cart"></i> Ordered Items</h5>
+        </div>
+        <div class="card-body bg-white">
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th class="text-white">Product</th>
+                            <th class="text-white">Category</th>
+                            <th class="text-white">Unit Price</th>
+                            <th class="text-white">Quantity</th>
+                            <th class="text-white">Total Price</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white">
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td class="text-dark">@item.Product.ProductName</td>
+                                <td class="text-dark">@item.Product.Category.CategoryName</td>
+                                <td class="text-dark">₹@item.UnitPrice.ToString("N0")</td>
+                                <td class="text-dark text-center">@item.Quantity</td>
+                                <td class="text-dark fw-bold">₹@item.TotalPrice.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <th colspan="4" class="text-end text-dark">Grand Total:</th>
+                            <th class="text-primary fw-bold">₹@Model.TotalAmount.ToString("N0")</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="text-center mt-4 mb-5">
+        <a href="/Admin/Admin/Orders" class="btn btn-primary btn-lg">
+            <i class="bi bi-arrow-left"></i> Back to All Orders
+        </a>
+        <a href="/Admin/Admin/Dashboard" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-speedometer2"></i> Go to Dashboard
+        </a>
+    </div>
+</div>

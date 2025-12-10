@@ -1,0 +1,84 @@
+﻿@model IEnumerable<ElectronicsStore.Models.Order>
+
+@{
+    ViewData["Title"] = "All Orders - Admin";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-box-seam"></i> All Customer Orders</h2>
+        <a href="/Admin/Admin/Dashboard" class="btn btn-outline-secondary">
+            <i class="bi bi-speedometer2"></i> Back to Dashboard
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <h4>No orders yet</h4>
+            <p>Orders will appear here once customers start purchasing.</p>
+        </div>
+    }
+    else
+    {
+        <div class="card shadow">
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Customer Name</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Order Date</th>
+                                <th>Items</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var order in Model)
+                            {
+                                <tr>
+                                    <td><strong>#@order.OrderId</strong></td>
+                                    <td>@order.FullName</td>
+                                    <td>@order.PhoneNumber</td>
+                                    <td>@order.City</td>
+                                    <td>@order.OrderDate.ToString("dd MMM yyyy")</td>
+                                    <td>@order.OrderItems.Count items</td>
+                                    <td class="fw-bold text-primary">₹@order.TotalAmount.ToString("N0")</td>
+                                    <td>
+                                        <form asp-action="UpdateOrderStatus" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="orderId" value="@order.OrderId" />
+                                            <select name="status" class="form-select form-select-sm
+                                                @(order.OrderStatus == "Pending" ? "bg-warning text-dark" :
+                                                  order.OrderStatus == "Processing" ? "bg-info text-white" :
+                                                  order.OrderStatus == "Shipped" ? "bg-primary text-white" :
+                                                  order.OrderStatus == "Delivered" ? "bg-success text-white" : "bg-danger text-white")"
+                                                    onchange="this.form.submit()">
+                                                <option value="Pending" @(order.OrderStatus == "Pending" ? "selected" : "")>Pending</option>
+                                                <option value="Processing" @(order.OrderStatus == "Processing" ? "selected" : "")>Processing</option>
+                                                <option value="Shipped" @(order.OrderStatus == "Shipped" ? "selected" : "")>Shipped</option>
+                                                <option value="Delivered" @(order.OrderStatus == "Delivered" ? "selected" : "")>Delivered</option>
+                                                <option value="Cancelled" @(order.OrderStatus == "Cancelled" ? "selected" : "")>Cancelled</option>
+                                            </select>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <a href="/Admin/Admin/OrderDetails/@order.OrderId" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> View Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>

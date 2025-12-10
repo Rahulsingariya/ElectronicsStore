@@ -1,0 +1,209 @@
+﻿@model ElectronicsStore.Models.Order
+
+@{
+    ViewData["Title"] = "Order Details";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2><i class="bi bi-receipt"></i> Order #@Model.OrderId</h2>
+        <a asp-action="MyOrders" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left"></i> Back to My Orders
+        </a>
+    </div>
+
+    <!-- Order Status Alert -->
+    <div class="alert
+        @(Model.OrderStatus == "Pending" ? "alert-warning" :
+          Model.OrderStatus == "Processing" ? "alert-info" :
+          Model.OrderStatus == "Shipped" ? "alert-primary" :
+          Model.OrderStatus == "Delivered" ? "alert-success" : "alert-danger")">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-0">
+                    <i class="bi
+                        @(Model.OrderStatus == "Delivered" ? "bi-check-circle" :
+                          Model.OrderStatus == "Shipped" ? "bi-truck" :
+                          Model.OrderStatus == "Processing" ? "bi-gear" : "bi-clock")"></i>
+                    Order Status: <strong>@Model.OrderStatus</strong>
+                </h5>
+            </div>
+            <small>Order Date: @Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</small>
+        </div>
+    </div>
+
+    <!-- Order Information Cards -->
+    <div class="row mb-4">
+        <div class="col-md-6 mb-3">
+            <div class="card shadow h-100">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-geo-alt"></i> Delivery Address</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Name:</strong> @Model.FullName</p>
+                    <p class="mb-2"><strong>Phone:</strong> @Model.PhoneNumber</p>
+                    <p class="mb-2"><strong>Address:</strong> @Model.ShippingAddress</p>
+                    <p class="mb-2"><strong>City:</strong> @Model.City</p>
+                    <p class="mb-2"><strong>State:</strong> @Model.State</p>
+                    <p class="mb-0"><strong>Zip Code:</strong> @Model.ZipCode</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+            <div class="card shadow h-100">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="bi bi-credit-card"></i> Payment Information</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2"><strong>Payment Method:</strong> Cash on Delivery</p>
+                    <p class="mb-2"><strong>Order Total:</strong> <span class="text-primary fs-4 fw-bold">₹@Model.TotalAmount.ToString("N0")</span></p>
+                    <p class="mb-0">
+                        <strong>Payment Status:</strong>
+                        <span class="badge bg-warning text-dark">
+                            @(Model.OrderStatus == "Delivered" ? "To be Paid on Delivery" : "Pending")
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ordered Items -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0"><i class="bi bi-cart"></i> Items in Your Order (@Model.OrderItems.Count)</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Product</th>
+                            <th>Category</th>
+                            <th class="text-center">Quantity</th>
+                            <th class="text-end">Unit Price</th>
+                            <th class="text-end">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr>
+                                <td>
+                                    <strong>@item.Product.ProductName</strong>
+                                </td>
+                                <td>@item.Product.Category.CategoryName</td>
+                                <td class="text-center">@item.Quantity</td>
+                                <td class="text-end">₹@item.UnitPrice.ToString("N0")</td>
+                                <td class="text-end fw-bold">₹@item.TotalPrice.ToString("N0")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <th colspan="4" class="text-end">Subtotal:</th>
+                            <th class="text-end">₹@((Model.TotalAmount / 1.18m).ToString("N0"))</th>
+                        </tr>
+                        <tr>
+                            <th colspan="4" class="text-end">Tax (18% GST):</th>
+                            <th class="text-end">₹@((Model.TotalAmount - Model.TotalAmount / 1.18m).ToString("N0"))</th>
+                        </tr>
+                        <tr class="table-primary">
+                            <th colspan="4" class="text-end fs-5">Grand Total:</th>
+                            <th class="text-end text-primary fs-5">₹@Model.TotalAmount.ToString("N0")</th>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Timeline -->
+    <div class="card shadow mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Order Timeline</h5>
+        </div>
+        <div class="card-body">
+            <div class="timeline">
+                <div class="timeline-item @(Model.OrderStatus == "Pending" || Model.OrderStatus == "Processing" || Model.OrderStatus == "Shipped" || Model.OrderStatus == "Delivered" ? "completed" : "")">
+                    <i class="bi bi-check-circle"></i>
+                    <div>
+                        <strong>Order Placed</strong>
+                        <p class="text-muted mb-0">@Model.OrderDate.ToString("dd MMM yyyy, hh:mm tt")</p>
+                    </div>
+                </div>
+                <div class="timeline-item @(Model.OrderStatus == "Processing" || Model.OrderStatus == "Shipped" || Model.OrderStatus == "Delivered" ? "completed" : "")">
+                    <i class="bi bi-gear"></i>
+                    <div>
+                        <strong>Processing</strong>
+                        <p class="text-muted mb-0">@(Model.OrderStatus == "Processing" || Model.OrderStatus == "Shipped" || Model.OrderStatus == "Delivered" ? "In Progress" : "Pending")</p>
+                    </div>
+                </div>
+                <div class="timeline-item @(Model.OrderStatus == "Shipped" || Model.OrderStatus == "Delivered" ? "completed" : "")">
+                    <i class="bi bi-truck"></i>
+                    <div>
+                        <strong>Shipped</strong>
+                        <p class="text-muted mb-0">@(Model.OrderStatus == "Shipped" || Model.OrderStatus == "Delivered" ? "On the way" : "Awaiting shipment")</p>
+                    </div>
+                </div>
+                <div class="timeline-item @(Model.OrderStatus == "Delivered" ? "completed" : "")">
+                    <i class="bi bi-box-seam"></i>
+                    <div>
+                        <strong>Delivered</strong>
+                        <p class="text-muted mb-0">@(Model.OrderStatus == "Delivered" ? "Completed" : "Expected soon")</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="text-center mb-5">
+        <a asp-action="MyOrders" class="btn btn-primary btn-lg">
+            <i class="bi bi-arrow-left"></i> Back to My Orders
+        </a>
+        <a asp-controller="Product" asp-action="Index" class="btn btn-outline-secondary btn-lg">
+            <i class="bi bi-cart"></i> Continue Shopping
+        </a>
+    </div>
+</div>
+
+<style>
+    .timeline {
+        position: relative;
+        padding-left: 50px;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding: 20px 0;
+        border-left: 2px solid #dee2e6;
+        padding-left: 30px;
+        opacity: 0.5;
+    }
+
+        .timeline-item.completed {
+            opacity: 1;
+            border-left-color: #28a745;
+        }
+
+        .timeline-item i {
+            position: absolute;
+            left: -12px;
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .timeline-item.completed i {
+            border-color: #28a745;
+            color: #28a745;
+        }
+</style>

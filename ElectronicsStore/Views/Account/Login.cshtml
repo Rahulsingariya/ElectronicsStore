@@ -1,0 +1,175 @@
+﻿@model ElectronicsStore.Models.ViewModels.LoginViewModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-5">
+            <div class="card shadow-sm mt-5">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        <i class="bi bi-person-circle text-primary"></i> Login
+                    </h2>
+
+                    <form asp-action="Login" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" placeholder="Enter your email" autofocus />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <small class="error-message"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input asp-for="Password" class="form-control" placeholder="Enter your password" />
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <small class="error-message"></small>
+                        </div>
+
+                        <div class="mb-4 form-check">
+                            <input asp-for="RememberMe" class="form-check-input" />
+                            <label asp-for="RememberMe" class="form-check-label"></label>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-center mb-0">
+                        Don't have an account?
+                        <a asp-action="Register" class="fw-bold text-decoration-none">Register here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <style>
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .is-valid {
+            border-color: #198754 !important;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            display: block;
+            margin-top: 0.25rem;
+        }
+    </style>
+
+    <script>
+        window.addEventListener('load', function() {
+
+            var emailInput = document.querySelector('input[name="Email"]');
+            if (emailInput) {
+                emailInput.oninput = function(e) {
+                    var val = e.target.value.trim();
+                    var errorMsg = e.target.parentElement.parentElement.querySelector('.error-message');
+                    var emailRegex = /^[^s@@]+@@[^s@@]+.[^s@@]+$/;
+
+                    if (val.length === 0) {
+                        e.target.classList.remove('is-valid', 'is-invalid');
+                        errorMsg.textContent = '';
+                    } else if (!emailRegex.test(val)) {
+                        e.target.classList.remove('is-valid');
+                        e.target.classList.add('is-invalid');
+                        errorMsg.textContent = 'Please enter a valid email address';
+                    } else {
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                        errorMsg.textContent = '';
+                    }
+                };
+            }
+
+            var toggleBtn = document.getElementById('togglePassword');
+            var passwordInput = document.querySelector('input[name="Password"]');
+            var toggleIcon = document.getElementById('toggleIcon');
+
+            if (toggleBtn && passwordInput) {
+                toggleBtn.onclick = function() {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleIcon.classList.remove('bi-eye');
+                        toggleIcon.classList.add('bi-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleIcon.classList.remove('bi-eye-slash');
+                        toggleIcon.classList.add('bi-eye');
+                    }
+                };
+            }
+
+            if (passwordInput) {
+                passwordInput.oninput = function(e) {
+                    var val = e.target.value;
+                    var errorMsg = e.target.parentElement.parentElement.querySelector('.error-message');
+
+                    if (val.length === 0) {
+                        e.target.classList.remove('is-valid', 'is-invalid');
+                        errorMsg.textContent = '';
+                    } else if (val.length < 6) {
+                        e.target.classList.remove('is-valid');
+                        e.target.classList.add('is-invalid');
+                        errorMsg.textContent = 'Password must be at least 6 characters';
+                    } else {
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                        errorMsg.textContent = '';
+                    }
+                };
+            }
+
+            var form = document.querySelector('form');
+            if (form) {
+                form.onsubmit = function(evt) {
+                    var isValid = true;
+
+                    if (emailInput && !emailInput.classList.contains('is-valid')) {
+                        isValid = false;
+                        emailInput.classList.add('is-invalid');
+                    }
+
+                    if (passwordInput && !passwordInput.classList.contains('is-valid')) {
+                        isValid = false;
+                        passwordInput.classList.add('is-invalid');
+                    }
+
+                    if (!isValid) {
+                        evt.preventDefault();
+                        alert('Please fix all errors before logging in');
+                        return false;
+                    }
+
+                    return true;
+                };
+            }
+        });
+    </script>
+}

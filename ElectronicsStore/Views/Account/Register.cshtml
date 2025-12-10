@@ -1,0 +1,265 @@
+﻿@model ElectronicsStore.Models.ViewModels.RegisterViewModel
+
+@{
+    ViewData["Title"] = "Register";
+}
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow-sm mt-5">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4">
+                        <i class="bi bi-person-plus-fill text-primary"></i> Create Account
+                    </h2>
+
+                    <form asp-action="Register" method="post">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="mb-3">
+                            <label asp-for="Email" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input asp-for="Email" class="form-control" placeholder="Enter your email" />
+                            </div>
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <small class="error-message"></small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Password" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                                <input asp-for="Password" class="form-control" placeholder="Enter password" />
+                                <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+                                    <i class="bi bi-eye" id="toggleIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                            <small class="error-message"></small>
+                            <div class="password-strength mt-2" style="display: none;">
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar" id="strengthBar" role="progressbar" style="width: 0%"></div>
+                                </div>
+                                <small id="strengthText" class="text-muted"></small>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="ConfirmPassword" class="form-label fw-bold"></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
+                                <input asp-for="ConfirmPassword" class="form-control" placeholder="Confirm your password" />
+                                <button class="btn btn-outline-secondary" type="button" id="toggleConfirmPassword">
+                                    <i class="bi bi-eye" id="toggleConfirmIcon"></i>
+                                </button>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                            <small class="error-message"></small>
+                        </div>
+
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-person-check"></i> Register
+                            </button>
+                        </div>
+                    </form>
+
+                    <hr class="my-4">
+
+                    <p class="text-center mb-0">
+                        Already have an account?
+                        <a asp-action="Login" class="fw-bold text-decoration-none">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <style>
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .is-valid {
+            border-color: #198754 !important;
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            display: block;
+            margin-top: 0.25rem;
+        }
+    </style>
+
+    <script>
+        window.addEventListener('load', function() {
+
+            var emailInput = document.querySelector('input[name="Email"]');
+            var passwordInput = document.querySelector('input[name="Password"]');
+            var confirmInput = document.querySelector('input[name="ConfirmPassword"]');
+
+            if (emailInput) {
+                emailInput.oninput = function(e) {
+                    var val = e.target.value.trim();
+                    var errorMsg = e.target.parentElement.parentElement.querySelector('.error-message');
+                    var emailRegex = /^[^s@@]+@@[^s@@]+.[^s@@]+$/;
+
+                    if (val.length === 0) {
+                        e.target.classList.remove('is-valid', 'is-invalid');
+                        errorMsg.textContent = '';
+                    } else if (!emailRegex.test(val)) {
+                        e.target.classList.remove('is-valid');
+                        e.target.classList.add('is-invalid');
+                        errorMsg.textContent = 'Please enter a valid email address';
+                    } else {
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                        errorMsg.textContent = '';
+                    }
+                };
+            }
+
+            if (passwordInput) {
+                var strengthBar = document.getElementById('strengthBar');
+                var strengthText = document.getElementById('strengthText');
+                var strengthDiv = document.querySelector('.password-strength');
+
+                passwordInput.oninput = function(e) {
+                    var val = e.target.value;
+                    var errorMsg = e.target.parentElement.parentElement.querySelector('.error-message');
+
+                    if (val.length === 0) {
+                        e.target.classList.remove('is-valid', 'is-invalid');
+                        errorMsg.textContent = '';
+                        strengthDiv.style.display = 'none';
+                    } else {
+                        strengthDiv.style.display = 'block';
+
+                        var strength = 0;
+                        if (val.length >= 6) strength += 25;
+                        if (val.length >= 10) strength += 25;
+                        if (/[a-z]/.test(val) && /[A-Z]/.test(val)) strength += 25;
+                        if (/[0-9]/.test(val) && /[^a-zA-Z0-9]/.test(val)) strength += 25;
+
+                        strengthBar.style.width = strength + '%';
+
+                        if (strength < 50) {
+                            strengthBar.className = 'progress-bar bg-danger';
+                            strengthText.textContent = 'Weak password';
+                            strengthText.className = 'text-danger';
+                            e.target.classList.add('is-invalid');
+                            e.target.classList.remove('is-valid');
+                            errorMsg.textContent = 'Password is too weak';
+                        } else if (strength < 75) {
+                            strengthBar.className = 'progress-bar bg-warning';
+                            strengthText.textContent = 'Medium strength';
+                            strengthText.className = 'text-warning';
+                            e.target.classList.add('is-valid');
+                            e.target.classList.remove('is-invalid');
+                            errorMsg.textContent = '';
+                        } else {
+                            strengthBar.className = 'progress-bar bg-success';
+                            strengthText.textContent = 'Strong password';
+                            strengthText.className = 'text-success';
+                            e.target.classList.add('is-valid');
+                            e.target.classList.remove('is-invalid');
+                            errorMsg.textContent = '';
+                        }
+                    }
+
+                    if (confirmInput && confirmInput.value.length > 0) {
+                        confirmInput.dispatchEvent(new Event('input'));
+                    }
+                };
+            }
+
+            if (confirmInput) {
+                confirmInput.oninput = function(e) {
+                    var val = e.target.value;
+                    var errorMsg = e.target.parentElement.parentElement.querySelector('.error-message');
+
+                    if (val.length === 0) {
+                        e.target.classList.remove('is-valid', 'is-invalid');
+                        errorMsg.textContent = '';
+                    } else if (val !== passwordInput.value) {
+                        e.target.classList.remove('is-valid');
+                        e.target.classList.add('is-invalid');
+                        errorMsg.textContent = 'Passwords do not match';
+                    } else {
+                        e.target.classList.remove('is-invalid');
+                        e.target.classList.add('is-valid');
+                        errorMsg.textContent = '';
+                    }
+                };
+            }
+
+            var toggleBtn = document.getElementById('togglePassword');
+            var toggleIcon = document.getElementById('toggleIcon');
+            if (toggleBtn && passwordInput) {
+                toggleBtn.onclick = function() {
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        toggleIcon.classList.remove('bi-eye');
+                        toggleIcon.classList.add('bi-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        toggleIcon.classList.remove('bi-eye-slash');
+                        toggleIcon.classList.add('bi-eye');
+                    }
+                };
+            }
+
+            var toggleConfirmBtn = document.getElementById('toggleConfirmPassword');
+            var toggleConfirmIcon = document.getElementById('toggleConfirmIcon');
+            if (toggleConfirmBtn && confirmInput) {
+                toggleConfirmBtn.onclick = function() {
+                    if (confirmInput.type === 'password') {
+                        confirmInput.type = 'text';
+                        toggleConfirmIcon.classList.remove('bi-eye');
+                        toggleConfirmIcon.classList.add('bi-eye-slash');
+                    } else {
+                        confirmInput.type = 'password';
+                        toggleConfirmIcon.classList.remove('bi-eye-slash');
+                        toggleConfirmIcon.classList.add('bi-eye');
+                    }
+                };
+            }
+
+            var form = document.querySelector('form');
+            if (form) {
+                form.onsubmit = function(evt) {
+                    var isValid = true;
+
+                    if (!emailInput.classList.contains('is-valid')) {
+                        isValid = false;
+                        emailInput.classList.add('is-invalid');
+                    }
+
+                    if (!passwordInput.classList.contains('is-valid')) {
+                        isValid = false;
+                        passwordInput.classList.add('is-invalid');
+                    }
+
+                    if (!confirmInput.classList.contains('is-valid')) {
+                        isValid = false;
+                        confirmInput.classList.add('is-invalid');
+                    }
+
+                    if (!isValid) {
+                        evt.preventDefault();
+                        alert('Please fix all errors before registering');
+                        return false;
+                    }
+
+                    return true;
+                };
+            }
+        });
+    </script>
+}

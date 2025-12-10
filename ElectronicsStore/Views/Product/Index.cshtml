@@ -1,0 +1,190 @@
+﻿@model IEnumerable<ElectronicsStore.Models.Product>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<div class="container my-4">
+    <!-- Header with Filter -->
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2>
+                @if (!string.IsNullOrEmpty(ViewBag.SelectedCategoryName))
+                {
+                    <text>@ViewBag.SelectedCategoryName</text>
+                }
+                else
+                {
+                    <text>All Products</text>
+                }
+            </h2>
+            @if (!string.IsNullOrEmpty(ViewBag.SelectedCategoryName))
+            {
+                <a href="/Product/Index" class="btn btn-sm btn-outline-secondary">
+                    <i class="bi bi-x"></i> Clear Filter
+                </a>
+            }
+        </div>
+        <div class="col-md-4">
+            <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle w-100" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-filter"></i>
+                    @if (ViewBag.SelectedCategory != null)
+                    {
+                        var selectedCat = ((List<ElectronicsStore.Models.Category>)ViewBag.Categories)
+                        .FirstOrDefault(c => c.CategoryId == ViewBag.SelectedCategory);
+                        @(selectedCat?.CategoryName ?? "Filter by Category")
+                    }
+                    else
+                    {
+                        <text>Filter by Category</text>
+                    }
+                </button>
+                <ul class="dropdown-menu w-100">
+                    <li><a class="dropdown-item" href="/Product/Index">All Categories</a></li>
+                    @foreach (var cat in (List<ElectronicsStore.Models.Category>)ViewBag.Categories)
+                    {
+                        <li><a class="dropdown-item" href="/Product/Index?categoryId=@cat.CategoryId">@cat.CategoryName</a></li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100 shadow-sm border-0">
+                        <!-- Stock Badge -->
+                        @if (product.StockQuantity > 0)
+                        {
+                            <span class="badge bg-success position-absolute top-0 start-0 m-2" style="z-index:1;">In Stock</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2" style="z-index:1;">Out of Stock</span>
+                        }
+
+                        <!-- Product Image -->
+                        <a asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none">
+                            <div class="product-image-container">
+                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl" class="product-image" alt="@product.ProductName"
+                                         onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image';" />
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/300x300?text=@product.ProductName" class="product-image" alt="@product.ProductName" />
+                                }
+                            </div>
+                        </a>
+
+                        <!-- Product Details -->
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-primary mb-2 align-self-start">@product.Category.CategoryName</span>
+
+                            <h5 class="card-title product-title mb-2">
+                                <a asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none text-dark">
+                                    @product.ProductName
+                                </a>
+                            </h5>
+
+                            <p class="card-text text-muted small mb-3 flex-grow-1">
+                                @if (product.Description != null && product.Description.Length > 60)
+                                {
+                                    @product.Description.Substring(0, 60)
+
+                                    <text>...</text>
+                                }
+                                else
+                                {
+                                    @product.Description
+                                }
+                            </p>
+
+                            <!-- Price -->
+                            <div class="mb-3">
+                                @if (product.DiscountPrice.HasValue && product.DiscountPrice < product.Price)
+                                {
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="price-tag text-primary fw-bold fs-4">₹@product.DiscountPrice.Value.ToString("N0")</span>
+                                        <small class="text-muted text-decoration-line-through">₹@product.Price.ToString("N0")</small>
+                                    </div>
+                                    <span class="badge bg-danger">Save ₹@((product.Price - product.DiscountPrice.Value).ToString("N0"))</span>
+                                }
+                                else
+                                {
+                                    <span class="price-tag text-primary fw-bold fs-4">₹@product.Price.ToString("N0")</span>
+                                }
+                            </div>
+
+                            <!-- Action Button -->
+                            <a asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-primary w-100">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info text-center py-5">
+            <i class="bi bi-inbox" style="font-size: 4rem;"></i>
+            <h4 class="mt-3">No products found</h4>
+            <p>Try selecting a different category or check back later.</p>
+            <a href="/Product/Index" class="btn btn-primary">View All Products</a>
+        </div>
+    }
+</div>
+
+<style>
+    .product-card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+        }
+
+    .product-image-container {
+        height: 250px;
+        background: #f9fafb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: hidden;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.1);
+    }
+
+    .product-title {
+        font-size: 1rem;
+        line-height: 1.4;
+        height: 2.8em;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+</style>

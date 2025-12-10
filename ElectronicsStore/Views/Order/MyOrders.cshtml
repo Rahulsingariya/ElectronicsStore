@@ -1,0 +1,72 @@
+﻿@model IEnumerable<ElectronicsStore.Models.Order>
+
+@{
+    ViewData["Title"] = "My Orders";
+}
+
+<div class="container">
+    <h2 class="mb-4">My Orders</h2>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            <h4>No orders yet</h4>
+            <p>You haven't placed any orders yet.</p>
+            <a asp-controller="Product" asp-action="Index" class="btn btn-primary">
+                Start Shopping
+            </a>
+        </div>
+    }
+    else
+    {
+        @foreach (var order in Model)
+        {
+            <div class="card mb-3">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-3">
+                            <strong>Order #@order.OrderId</strong>
+                        </div>
+                        <div class="col-md-3">
+                            @order.OrderDate.ToString("dd MMM yyyy")
+                        </div>
+                        <div class="col-md-3">
+                            <span class="badge
+                                @(order.OrderStatus == "Pending" ? "bg-warning" :
+                                  order.OrderStatus == "Processing" ? "bg-info" :
+                                  order.OrderStatus == "Shipped" ? "bg-primary" :
+                                  order.OrderStatus == "Delivered" ? "bg-success" : "bg-danger")">
+                                @order.OrderStatus
+                            </span>
+                        </div>
+                        <div class="col-md-3 text-end">
+                            <strong class="text-primary">₹@order.TotalAmount.ToString("N0")</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h6>Items (@order.OrderItems.Count):</h6>
+                            <ul class="list-unstyled">
+                                @foreach (var item in order.OrderItems.Take(3))
+                                {
+                                    <li>• @item.Product.ProductName (x@item.Quantity)</li>
+                                }
+                                @if (order.OrderItems.Count > 3)
+                                {
+                                    <li>... and @(order.OrderItems.Count - 3) more</li>
+                                }
+                            </ul>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <a asp-action="Details" asp-route-id="@order.OrderId" class="btn btn-outline-primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>

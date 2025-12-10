@@ -1,0 +1,102 @@
+﻿@model IEnumerable<ElectronicsStore.Models.Wishlist>
+
+@{
+    ViewData["Title"] = "My Wishlist";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4">
+        <i class="bi bi-heart-fill text-danger"></i> My Wishlist
+    </h2>
+
+    @if (!Model.Any())
+    {
+        <div class="card">
+            <div class="card-body text-center p-5">
+                <i class="bi bi-heart" style="font-size: 5rem; color: #d1d5db;"></i>
+                <h4 class="mt-3">Your wishlist is empty</h4>
+                <p class="text-muted">Save your favorite products here</p>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-primary mt-3">
+                    Browse Products
+                </a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        <div class="position-relative">
+                            @if (!string.IsNullOrEmpty(item.Product.ImageUrl))
+                            {
+                                <img src="@item.Product.ImageUrl"
+                                     class="card-img-top"
+                                     alt="@item.Product.ProductName"
+                                     style="height: 250px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="d-flex align-items-center justify-content-center bg-light" style="height: 250px;">
+                                    <i class="bi bi-image" style="font-size: 4rem; color: #d1d5db;"></i>
+                                </div>
+                            }
+
+                            @if (item.Product.StockQuantity > 0)
+                            {
+                                <span class="badge bg-success position-absolute top-0 end-0 m-2">In Stock</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger position-absolute top-0 end-0 m-2">Out of Stock</span>
+                            }
+                        </div>
+                        <div class="card-body">
+                            <span class="badge bg-primary mb-2">@item.Product.Category.CategoryName</span>
+                            <h5 class="card-title">@item.Product.ProductName</h5>
+                            <p class="card-text text-muted small">
+                                @if (item.Product.Description != null && item.Product.Description.Length > 60)
+                                {
+                                    @item.Product.Description.Substring(0, 60)
+
+                                    <text>...</text>
+                                }
+                                else
+                                {
+                                    @item.Product.Description
+                                }
+                            </p>
+                            <h4 class="text-primary fw-bold">₹@item.Product.Price.ToString("N0")</h4>
+                            <small class="text-muted">Added on @item.AddedDate.ToString("dd MMM yyyy")</small>
+                        </div>
+                        <div class="card-footer bg-white">
+                            <div class="d-grid gap-2">
+                                @if (item.Product.StockQuantity > 0)
+                                {
+                                    <form asp-action="MoveToCart" method="post">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <input type="hidden" name="wishlistId" value="@item.WishlistId" />
+                                        <button type="submit" class="btn btn-primary w-100">
+                                            <i class="bi bi-cart-plus"></i> Move to Cart
+                                        </button>
+                                    </form>
+                                }
+                                <form asp-action="RemoveFromWishlist" method="post"
+                                      onsubmit="return confirm('Remove from wishlist?');">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="wishlistId" value="@item.WishlistId" />
+                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                        <i class="bi bi-trash"></i> Remove
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

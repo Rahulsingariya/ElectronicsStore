@@ -1,0 +1,340 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ElectronicsStore</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light shadow-sm">
+            <div class="container-fluid">
+                <a class="navbar-brand fw-bold" asp-area="" asp-controller="Home" asp-action="Index">
+                    🛒 ElectronicsStore
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                        aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
+                                <i class="bi bi-house-door"></i> Home
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" asp-area="" asp-controller="Product" asp-action="Index">
+                                <i class="bi bi-grid"></i> Products
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- Search Bar -->
+                    <form asp-controller="Product" asp-action="Index" method="get" class="d-flex me-3" style="width: 300px;">
+                        <div class="input-group">
+                            <input type="text" name="searchString" class="form-control search-input"
+                                   placeholder="Search products..." value="@ViewBag.SearchString" />
+                            <button class="btn btn-search" type="submit">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </div>
+                    </form>
+
+                    <ul class="navbar-nav">
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            @if (string.Equals(User.Identity.Name, "rahul@gmail.com", StringComparison.OrdinalIgnoreCase))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link text-danger fw-bold" asp-area="Admin" asp-controller="Admin" asp-action="Dashboard">
+                                        <i class="bi bi-speedometer2"></i> Admin
+                                    </a>
+                                </li>
+                            }
+
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Wishlist" asp-action="Index">
+                                    <i class="bi bi-heart"></i> Wishlist
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Cart" asp-action="Index">
+                                    <i class="bi bi-cart3"></i> Cart
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-area="" asp-controller="Order" asp-action="MyOrders">
+                                    <i class="bi bi-box-seam"></i> Orders
+                                </a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                                   data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Order" asp-action="MyOrders">
+                                            <i class="bi bi-box-seam"></i> My Orders
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Wishlist" asp-action="Index">
+                                            <i class="bi bi-heart"></i> My Wishlist
+                                        </a>
+                                    </li>
+
+                                    @if (string.Equals(User.Identity.Name, "rahul@gmail.com", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        <li>
+                                            <a class="dropdown-item text-danger" asp-area="Admin" asp-controller="Admin" asp-action="Dashboard">
+                                                <i class="bi bi-speedometer2"></i> Admin Dashboard
+                                            </a>
+                                        </li>
+                                    }
+
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a href="/Account/Logout" class="dropdown-item text-danger">
+                                            <i class="bi bi-box-arrow-right"></i> Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">
+                                    <i class="bi bi-box-arrow-in-right"></i> Login
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link btn btn-primary text-white ms-2 px-3" asp-controller="Account" asp-action="Register">
+                                    <i class="bi bi-person-plus"></i> Register
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer mt-5">
+        <div class="container py-4">
+            <div class="row">
+                <div class="col-md-4">
+                    <h5 class="text-white fw-bold mb-3">ElectronicsStore</h5>
+                    <p class="text-white-50">Your trusted source for quality electronics and gadgets.</p>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="text-white fw-bold mb-3">Quick Links</h6>
+                    <ul class="list-unstyled">
+                        <li>
+                            <a asp-controller="Home" asp-action="AboutUs" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-info-circle"></i> About Us
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Home" asp-action="Contact" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-envelope"></i> Contact
+                            </a>
+                        </li>
+                        <li>
+                            <a asp-controller="Home" asp-action="Privacy" class="text-white-50 text-decoration-none">
+                                <i class="bi bi-shield-check"></i> Privacy Policy
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h6 class="text-white fw-bold mb-3">Follow Us</h6>
+                    <div>
+                        <a href="#" class="text-white-50 me-3"><i class="bi bi-facebook" style="font-size: 1.5rem;"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="bi bi-twitter" style="font-size: 1.5rem;"></i></a>
+                        <a href="#" class="text-white-50 me-3"><i class="bi bi-instagram" style="font-size: 1.5rem;"></i></a>
+                        <a href="#" class="text-white-50"><i class="bi bi-youtube" style="font-size: 1.5rem;"></i></a>
+                    </div>
+                </div>
+            </div>
+            <hr class="bg-white-50 my-4">
+            <div class="text-center text-white-50">
+                &copy; 2025 ElectronicsStore. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <!-- Professional Toast Notification Container -->
+    <div id="toast-container" style="position: fixed; top: 80px; right: 20px; z-index: 99999; min-width: 350px;"></div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        // Global Toast Notification System
+        function showToast(type, title, message, duration = 4000) {
+            var existingToasts = document.querySelectorAll('.custom-toast-notification');
+            if (existingToasts.length >= 3) {
+                existingToasts[0].remove();
+            }
+
+            var config = {
+                success: {
+                    bg: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    icon: 'bi-check-circle-fill',
+                    iconColor: '#ffffff',
+                    progress: '#ffffff'
+                },
+                error: {
+                    bg: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+                    icon: 'bi-x-circle-fill',
+                    iconColor: '#ffffff',
+                    progress: '#ffffff'
+                },
+                warning: {
+                    bg: 'linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%)',
+                    icon: 'bi-exclamation-triangle-fill',
+                    iconColor: '#2d3436',
+                    progress: '#2d3436'
+                },
+                info: {
+                    bg: 'linear-gradient(135deg, #a8e6cf 0%, #56ab91 100%)',
+                    icon: 'bi-info-circle-fill',
+                    iconColor: '#ffffff',
+                    progress: '#ffffff'
+                }
+            };
+
+            var style = config[type] || config.info;
+
+            var toastHtml = `
+                <div class="custom-toast-notification" style="
+                    background: ${style.bg};
+                    margin-bottom: 15px;
+                    border-radius: 12px;
+                    overflow: hidden;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+                    animation: slideInRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+                    min-width: 350px;
+                    max-width: 400px;
+                ">
+                    <div style="padding: 16px 20px; display: flex; align-items: flex-start; gap: 12px; position: relative;">
+                        <i class="bi ${style.icon}" style="font-size: 28px; color: ${style.iconColor}; flex-shrink: 0;"></i>
+                        <div style="flex-grow: 1;">
+                            <div style="font-weight: 600; font-size: 15px; color: white; margin-bottom: 4px;">
+                                ${title}
+                            </div>
+                            <div style="font-size: 13px; color: rgba(255,255,255,0.9); line-height: 1.4;">
+                                ${message}
+                            </div>
+                        </div>
+                        <button onclick="this.parentElement.parentElement.remove()" style="
+                            background: transparent;
+                            border: none;
+                            color: white;
+                            font-size: 20px;
+                            cursor: pointer;
+                            padding: 0;
+                            width: 24px;
+                            height: 24px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            opacity: 0.8;
+                            transition: opacity 0.2s;
+                        " onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.8'">
+                            ×
+                        </button>
+                    </div>
+                    <div class="toast-progress" style="
+                        height: 4px;
+                        background: ${style.progress};
+                        width: 100%;
+                        animation: progressBar ${duration}ms linear;
+                        opacity: 0.7;
+                    "></div>
+                </div>
+            `;
+
+            var container = document.getElementById('toast-container');
+            container.insertAdjacentHTML('beforeend', toastHtml);
+            var toastElement = container.lastElementChild;
+
+            setTimeout(function() {
+                toastElement.style.animation = 'slideOutRight 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)';
+                setTimeout(function() {
+                    toastElement.remove();
+                }, 400);
+            }, duration);
+        }
+    </script>
+
+    <style>
+        @@keyframes slideInRight {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+        }
+
+        @@keyframes progressBar {
+            from {
+                width: 100%;
+            }
+
+            to {
+                width: 0%;
+            }
+        }
+
+        .custom-toast-notification:hover .toast-progress {
+            animation-play-state: paused;
+        }
+    </style>
+
+    @if (TempData["ToastType"] != null)
+    {
+        <script>
+            window.addEventListener('load', function() {
+                showToast(
+                    '@TempData["ToastType"]',
+                    '@TempData["ToastTitle"]',
+                    '@TempData["ToastMessage"]',
+                    4000
+                );
+            });
+        </script>
+    }
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

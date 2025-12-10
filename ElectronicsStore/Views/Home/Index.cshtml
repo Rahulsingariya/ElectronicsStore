@@ -1,0 +1,276 @@
+﻿@model IEnumerable<ElectronicsStore.Models.Product>
+
+@{
+    ViewData["Title"] = "Home - ElectronicsStore";
+}
+
+<!-- Hero Banner -->
+<div class="hero-banner">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4 text-white">Welcome to ElectronicsStore</h1>
+                <p class="lead mb-4 text-white">Discover the latest electronics, gadgets, and tech accessories at unbeatable prices!</p>
+                <a asp-controller="Product" asp-action="Index" class="btn btn-light btn-lg shadow">
+                    <i class="bi bi-shop"></i> Shop Now
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container my-5">
+    <div class="row text-center g-4">
+        <div class="col-md-4">
+            <div class="feature-card p-4">
+                <i class="bi bi-truck" style="font-size: 3rem; color: #667eea;"></i>
+                <h4 class="mt-3">Free Shipping</h4>
+                <p class="text-muted mb-0">On all orders across India</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card p-4">
+                <i class="bi bi-shield-check" style="font-size: 3rem; color: #10b981;"></i>
+                <h4 class="mt-3">Secure Payment</h4>
+                <p class="text-muted mb-0">100% secure transactions</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="feature-card p-4">
+                <i class="bi bi-arrow-repeat" style="font-size: 3rem; color: #f59e0b;"></i>
+                <h4 class="mt-3">Easy Returns</h4>
+                <p class="text-muted mb-0">7 days return policy</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Featured Products Section -->
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">
+            <i class="bi bi-star-fill text-warning"></i> Featured Products
+        </h2>
+        <a asp-controller="Product" asp-action="Index" class="btn btn-outline-primary">
+            View All <i class="bi bi-arrow-right"></i>
+        </a>
+    </div>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var product in Model.Take(8))
+            {
+                <div class="col-lg-3 col-md-4 col-sm-6">
+                    <div class="card product-card h-100 shadow-sm border-0">
+                        <!-- Stock Badge -->
+                        @if (product.StockQuantity > 0)
+                        {
+                            <span class="badge bg-success position-absolute top-0 start-0 m-2 z-index-1">In Stock</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger position-absolute top-0 start-0 m-2 z-index-1">Out of Stock</span>
+                        }
+
+                        <!-- Product Image -->
+                        <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none">
+                            <div class="product-image-container">
+                                @if (!string.IsNullOrEmpty(product.ImageUrl))
+                                {
+                                    <img src="@product.ImageUrl" class="product-image" alt="@product.ProductName"
+                                         onerror="this.onerror=null; this.src='https://via.placeholder.com/300x300?text=No+Image';" />
+                                }
+                                else
+                                {
+                                    <img src="https://via.placeholder.com/300x300?text=@product.ProductName" class="product-image" alt="@product.ProductName" />
+                                }
+                            </div>
+                        </a>
+
+                        <!-- Product Details -->
+                        <div class="card-body d-flex flex-column">
+                            <span class="badge bg-primary mb-2 align-self-start">@product.Category.CategoryName</span>
+
+                            <h5 class="card-title product-title mb-2">
+                                <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="text-decoration-none text-dark">
+                                    @product.ProductName
+                                </a>
+                            </h5>
+
+                            <p class="card-text text-muted small mb-3 flex-grow-1">
+                                @(product.Description.Length > 60 ? product.Description.Substring(0, 60) + "..." : product.Description)
+                            </p>
+
+                            <!-- Price -->
+                            <div class="mb-3">
+                                @if (product.DiscountPrice.HasValue && product.DiscountPrice < product.Price)
+                                {
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="price-tag text-primary fw-bold fs-4">₹@product.DiscountPrice.Value.ToString("N0")</span>
+                                        <small class="text-muted text-decoration-line-through">₹@product.Price.ToString("N0")</small>
+                                    </div>
+                                    <span class="badge bg-danger">Save ₹@((product.Price - product.DiscountPrice.Value).ToString("N0"))</span>
+                                }
+                                else
+                                {
+                                    <span class="price-tag text-primary fw-bold fs-4">₹@product.Price.ToString("N0")</span>
+                                }
+                            </div>
+
+                            <!-- Action Button -->
+                            <a asp-controller="Product" asp-action="Details" asp-route-id="@product.ProductId" class="btn btn-primary w-100">
+                                <i class="bi bi-eye"></i> View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info">
+            <h4>No products available</h4>
+            <p>Products will appear here soon!</p>
+        </div>
+    }
+</div>
+
+<!-- Categories Section -->
+<div class="container my-5 py-5 bg-light rounded">
+    <h2 class="text-center mb-4 fw-bold">Shop by Category</h2>
+    <div class="row g-4 text-center">
+        <div class="col-md-2 col-sm-4 col-6">
+            <a href="/Product/Index?category=Laptops" class="text-decoration-none">
+                <div class="category-card p-4">
+                    <i class="bi bi-laptop" style="font-size: 3rem; color: #667eea;"></i>
+                    <h6 class="mt-2 mb-0">Laptops</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <a href="/Product/Index?category=Smartphones" class="text-decoration-none">
+                <div class="category-card p-4">
+                    <i class="bi bi-phone" style="font-size: 3rem; color: #10b981;"></i>
+                    <h6 class="mt-2 mb-0">Smartphones</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <a href="/Product/Index?category=Headphones" class="text-decoration-none">
+                <div class="category-card p-4">
+                    <i class="bi bi-headphones" style="font-size: 3rem; color: #f59e0b;"></i>
+                    <h6 class="mt-2 mb-0">Headphones</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <a href="/Product/Index?category=Cameras" class="text-decoration-none">
+                <div class="category-card p-4">
+                    <i class="bi bi-camera" style="font-size: 3rem; color: #ef4444;"></i>
+                    <h6 class="mt-2 mb-0">Cameras</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <a href="/Product/Index?category=Smartwatches" class="text-decoration-none">
+                <div class="category-card p-4">
+                    <i class="bi bi-smartwatch" style="font-size: 3rem; color: #8b5cf6;"></i>
+                    <h6 class="mt-2 mb-0">Smartwatches</h6>
+                </div>
+            </a>
+        </div>
+        <div class="col-md-2 col-sm-4 col-6">
+            <a href="/Product/Index" class="text-decoration-none">
+                <div class="category-card p-4">
+                    <i class="bi bi-grid-3x3" style="font-size: 3rem; color: #06b6d4;"></i>
+                    <h6 class="mt-2 mb-0">View All</h6>
+                </div>
+            </a>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hero-banner {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 100px 0;
+        margin-bottom: 50px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .feature-card {
+        background: white;
+        border-radius: 15px;
+        transition: all 0.3s ease;
+        border: 1px solid #e5e7eb;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+    .product-card {
+        border-radius: 15px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15) !important;
+        }
+
+    .product-image-container {
+        height: 250px;
+        background: #f9fafb;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        overflow: hidden;
+    }
+
+    .product-image {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        transition: transform 0.3s ease;
+    }
+
+    .product-card:hover .product-image {
+        transform: scale(1.1);
+    }
+
+    .product-title {
+        font-size: 1rem;
+        line-height: 1.4;
+        height: 2.8em;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+
+    .category-card {
+        background: white;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: 2px solid transparent;
+    }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+
+    .z-index-1 {
+        z-index: 1;
+    }
+</style>

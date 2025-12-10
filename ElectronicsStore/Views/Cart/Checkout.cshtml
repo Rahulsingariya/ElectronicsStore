@@ -1,0 +1,309 @@
+﻿@model ElectronicsStore.Models.ViewModels.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Checkout";
+}
+
+<div class="container my-5">
+    <h2 class="mb-4"><i class="bi bi-cart-check"></i> Checkout</h2>
+
+    <form asp-controller="Order" asp-action="PlaceOrder" method="post">
+        <div class="row">
+            <div class="col-md-7">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-truck"></i> Shipping Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="FullName" class="form-label"></label>
+                            <input asp-for="FullName" class="form-control" placeholder="Enter your full name">
+                            <span asp-validation-for="FullName" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="PhoneNumber" class="form-label"></label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="Enter your phone number">
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ShippingAddress" class="form-label"></label>
+                            <textarea asp-for="ShippingAddress" class="form-control" rows="3" placeholder="Enter your delivery address"></textarea>
+                            <span asp-validation-for="ShippingAddress" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="City" class="form-label"></label>
+                                <input asp-for="City" class="form-control" placeholder="City">
+                                <span asp-validation-for="City" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="State" class="form-label"></label>
+                                <input asp-for="State" class="form-control" placeholder="State">
+                                <span asp-validation-for="State" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="ZipCode" class="form-label"></label>
+                            <input asp-for="ZipCode" class="form-control" placeholder="Zip Code">
+                            <span asp-validation-for="ZipCode" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="bi bi-credit-card"></i> Payment Method</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input" type="radio" name="PaymentMethod" id="cod" value="Cash on Delivery" checked>
+                            <label class="form-check-label fw-bold" for="cod">
+                                <i class="bi bi-cash-coin text-success"></i> Cash on Delivery
+                                <small class="d-block text-muted">Pay when you receive the product</small>
+                            </label>
+                        </div>
+
+                        <div class="form-check mb-3 p-3 border rounded">
+                            <input class="form-check-input" type="radio" name="PaymentMethod" id="card" value="Credit/Debit Card">
+                            <label class="form-check-label fw-bold" for="card">
+                                <i class="bi bi-credit-card text-primary"></i> Credit/Debit Card
+                                <small class="d-block text-muted">Pay securely with your card</small>
+                            </label>
+                        </div>
+
+                        <div id="cardDetailsForm" style="display: none;" class="mt-4 p-4 bg-light rounded border">
+                            <h6 class="mb-3 text-primary"><i class="bi bi-shield-check"></i> Enter Card Details</h6>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Card Number</label>
+                                <input type="text" id="cardNumber" class="form-control" placeholder="1234 5678 9012 3456" maxlength="19">
+                                <small class="text-muted"><i class="bi bi-lock-fill"></i> Secure and encrypted</small>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">Expiry Date</label>
+                                    <input type="text" id="cardExpiry" class="form-control" placeholder="MM/YY" maxlength="5">
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label fw-bold">CVV</label>
+                                    <input type="text" id="cardCVV" class="form-control" placeholder="123" maxlength="4">
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold">Cardholder Name</label>
+                                <input type="text" id="cardName" class="form-control" placeholder="Name on card">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="bi bi-receipt"></i> Order Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="mb-3">Cart Items</h6>
+                        @foreach (var item in ViewBag.CartItems)
+                        {
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>@item.Product.ProductName x @item.Quantity</span>
+                                <span class="fw-bold">₹@((item.Product.Price * item.Quantity).ToString("N0"))</span>
+                            </div>
+                        }
+                        <hr>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Subtotal</span>
+                            <span>₹@ViewBag.CartTotal.ToString("N0")</span>
+                        </div>
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Shipping</span>
+                            <span class="text-success">FREE</span>
+                        </div>
+                        <hr>
+                        <div class="d-flex justify-content-between">
+                            <h5>Total</h5>
+                            <h5 class="text-primary">₹@ViewBag.CartTotal.ToString("N0")</h5>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn btn-success btn-lg w-100 mt-3">
+                    <i class="bi bi-check-circle"></i> Place Order
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <style>
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(.375em + .1875rem) center;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+        }
+
+        .is-valid {
+            border-color: #198754 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(.375em + .1875rem) center;
+            background-size: calc(.75em + .375rem) calc(.75em + .375rem);
+        }
+
+        .error-message {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+    </style>
+
+    <script>
+        window.addEventListener('load', function() {
+            function showError(input, message) {
+                input.classList.remove('is-valid');
+                input.classList.add('is-invalid');
+                var errorDiv = input.parentElement.querySelector('.error-message');
+                if (!errorDiv) {
+                    errorDiv = document.createElement('small');
+                    errorDiv.className = 'error-message';
+                    input.parentElement.appendChild(errorDiv);
+                }
+                errorDiv.textContent = message;
+            }
+
+            function showSuccess(input) {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+                var errorDiv = input.parentElement.querySelector('.error-message');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            }
+
+            function clearValidation(input) {
+                input.classList.remove('is-valid', 'is-invalid');
+                var errorDiv = input.parentElement.querySelector('.error-message');
+                if (errorDiv) {
+                    errorDiv.remove();
+                }
+            }
+
+            var fullName = document.querySelector('input[name="FullName"]');
+            if (fullName) {
+                fullName.oninput = function(e) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z ]/g, '');
+                    var val = e.target.value.trim();
+                    if (val.length === 0) {
+                        clearValidation(e.target);
+                    } else if (val.length < 3) {
+                        showError(e.target, 'Name must be at least 3 characters');
+                    } else {
+                        showSuccess(e.target);
+                    }
+                };
+            }
+
+            var phone = document.querySelector('input[name="PhoneNumber"]');
+            if (phone) {
+                phone.oninput = function(e) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '').substring(0, 10);
+                    var val = e.target.value;
+                    if (val.length === 0) {
+                        clearValidation(e.target);
+                    } else if (val.length !== 10) {
+                        showError(e.target, 'Phone must be exactly 10 digits');
+                    } else {
+                        showSuccess(e.target);
+                    }
+                };
+            }
+
+            var address = document.querySelector('textarea[name="ShippingAddress"]');
+            if (address) {
+                address.oninput = function(e) {
+                    var val = e.target.value.trim();
+                    if (val.length === 0) {
+                        clearValidation(e.target);
+                    } else if (val.length < 10) {
+                        showError(e.target, 'Address must be at least 10 characters');
+                    } else {
+                        showSuccess(e.target);
+                    }
+                };
+            }
+
+            var city = document.querySelector('input[name="City"]');
+            if (city) {
+                city.oninput = function(e) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z ]/g, '');
+                    var val = e.target.value.trim();
+                    if (val.length === 0) {
+                        clearValidation(e.target);
+                    } else if (val.length < 3) {
+                        showError(e.target, 'City must be at least 3 characters');
+                    } else {
+                        showSuccess(e.target);
+                    }
+                };
+            }
+
+            var state = document.querySelector('input[name="State"]');
+            if (state) {
+                state.oninput = function(e) {
+                    e.target.value = e.target.value.replace(/[^a-zA-Z ]/g, '');
+                    var val = e.target.value.trim();
+                    if (val.length === 0) {
+                        clearValidation(e.target);
+                    } else if (val.length < 3) {
+                        showError(e.target, 'State must be at least 3 characters');
+                    } else {
+                        showSuccess(e.target);
+                    }
+                };
+            }
+
+            var zipCode = document.querySelector('input[name="ZipCode"]');
+            if (zipCode) {
+                zipCode.oninput = function(e) {
+                    e.target.value = e.target.value.replace(/[^0-9]/g, '').substring(0, 6);
+                    var val = e.target.value;
+                    if (val.length === 0) {
+                        clearValidation(e.target);
+                    } else if (val.length !== 6) {
+                        showError(e.target, 'Zip Code must be exactly 6 digits');
+                    } else {
+                        showSuccess(e.target);
+                    }
+                };
+            }
+
+            var cardRadio = document.getElementById('card');
+            var codRadio = document.getElementById('cod');
+            var cardForm = document.getElementById('cardDetailsForm');
+
+            if (cardRadio && codRadio && cardForm) {
+                cardRadio.onclick = function() {
+                    cardForm.style.display = 'block';
+                };
+
+                codRadio.onclick = function() {
+                    cardForm.style.display = 'none';
+                };
+            }
+        });
+    </script>
+}
