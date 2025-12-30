@@ -1,6 +1,3 @@
-﻿-- Insert more products across all categories
--- Make sure to check CategoryId values match your database
-
 -- Laptops Category (CategoryId = 1)
 INSERT INTO Products (ProductName, Description, Price, StockQuantity, CategoryId, IsActive, CreatedDate, ImageUrl, DiscountPrice)
 VALUES
